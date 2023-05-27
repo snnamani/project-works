@@ -1,0 +1,32 @@
+node{
+    def mavenHome = tool name: 'maven3.9.1'
+    stage('1.CodeClone'){
+    git 'https://github.com/zaralink/maven-web-application'
+    }
+    stage('2.MavenBuild'){
+    sh "${mavenHome}/bin/mvn clean package"
+    }
+    
+   stage('3.codeQuality'){
+   sh "${mavenHome}/bin/mvn sonar:sonar"
+   }
+   stage('4.DeployArtifactsToNexus'){
+   sh "${mavenHome}/bin/mvn deploy"
+   }
+   stage('5.Deploy2UAT'){
+   deploy adapters: [tomcat9(credentialsId: 'tomcat-id', path: '', url: 'http://52.91.71.212:8080/')], contextPath: null, war: 'target/*war'
+   }
+   stage('6.Manualapproval'){
+    sh "echo 'ready for review' "
+    timeout(time:5, unit:'HOURS') {
+    input message: 'Application ready for deployment, Please review and approve'
+      }
+  }
+  stage('7.Deploy2Prod'){
+   deploy adapters: [tomcat9(credentialsId: 'tomcat-id', path: '', url: 'http://52.91.71.212:8080/')], contextPath: null, war: 'target/*war'
+   } 
+   stage('8Notification'){
+    emailext body: 'Hello team! Deployment completed', subject: 'Deployment Status', to: 'xtrahyptek@gmail.com'
+  }
+   
+}

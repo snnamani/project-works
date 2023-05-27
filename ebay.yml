@@ -1,0 +1,43 @@
+kind: Deployment   
+apiVersion: apps/v1  
+metadata:
+  name: java  
+spec:
+  replicas: 2    
+  selector:       # equality based selectors or set based selectors
+    matchLabels:   # this is equality based selector
+      app: java  
+  template:
+    metadata:
+      name: javawebapp
+      labels:
+        app: java  
+    spec: 
+      nodeSelector:
+        node: memory_optimz  
+      containers:  
+      - name: javawebapp
+        image: mylandmarktech/java-web-app
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: 256m
+            memory: 128Mi
+          limits:
+            cpu: 3000m
+            memory: 856Mi
+
+---
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: webappsvc
+spec:
+  type: LoadBalancer
+  ports:
+  - targetPort: 8080
+    port: 80
+  selector:
+    app: java
