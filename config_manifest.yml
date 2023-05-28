@@ -48,7 +48,7 @@ kind: Service
 metadata:
   name: springappsvc
 spec:
-  type: LoadBalancer
+  type: ClusterIp
   selector:
     app: springapp
   ports:
