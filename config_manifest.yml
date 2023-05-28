@@ -48,7 +48,8 @@ kind: Service
 metadata:
   name: springappsvc
 spec:
-  type: ClusterIp
+  type: ClusterIP
+
   selector:
     app: springapp
   ports:
